@@ -1,0 +1,21 @@
+# Web build tooling
+node_modules
+dist
+.env.local
+.DS_Store
+shot_*.png
+e2e_*.py
+
+# Android build outputs (regenerated automatically, not real source)
+android/build
+android/app/build
+android/.gradle
+android/local.properties
+android/capacitor-cordova-android-plugins/build
+android/app/src/main/assets/public
+
+# Leftover repair backup folders from this session (safe to ignore/delete)
+*_stale_backup*
+*_broken_backup*
+node_modules_broken_backup
+_claude_repair_backups

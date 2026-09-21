@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Dedicated small/status-bar icon for Axie GO's notifications.
+
+  The status-bar "small icon" is NOT allowed to be the app's regular
+  launcher icon — Android requires (and silently enforces) that it be a
+  simple, flat, single-color stencil: opaque where the glyph is, fully
+  transparent everywhere else. It then renders that shape as a plain white
+  silhouette (tinted per-theme), throwing the source colors away entirely.
+
+  Both notification services were passing @mipmap/ic_launcher — the full,
+  multi-layer, full-color ADAPTIVE icon — as the small icon. Android can't
+  turn that into a silhouette, so instead of erroring it falls back to its
+  own generic placeholder glyph, tinted with the default notification
+  color. That's the "wrong logo" — it was never actually rendering any of
+  Axie GO's own artwork, adaptive-icon fix or not. The branded, full-color
+  icon still shows correctly wherever the LARGE icon is used (see
+  IconUtil.largeIcon), which is what the expanded notification shows.
+
+  Shape here is a simple location pin, on-theme for a GPS walk/run tracker
+  (echoes the pin already in the in-app logo) and simple enough to read
+  clearly at 24dp.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13C19,5.13 15.87,2 12,2zM12,11.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5S13.38,11.5 12,11.5z" />
+</vector>

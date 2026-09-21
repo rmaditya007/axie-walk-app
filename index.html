@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0" />
+    <meta name="theme-color" content="#0a0a0c" />
+    <title>Axie GO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="splash">
+      <div class="splash-scrim"></div>
+      <div class="splash-bottom">
+        <p class="splash-tag">Walk it. Run it. Earn it in $bAXS.</p>
+        <button class="splash-cta" id="splash-cta">LFG &#x1F680;&#x1F680;</button>
+        <div class="splash-foot">Real GPS &middot; Real map</div>
+      </div>
+    </div>
+
+    <div id="app">
+      <!-- ============ TRACK VIEW ============ -->
+      <section class="view" id="view-track">
+        <header class="stat-strip" id="stat-strip" hidden>
+          <div class="stat"><span class="stat-value" id="stat-km">0.00</span><span class="stat-label">KM</span></div>
+          <div class="stat stat-primary"><span class="stat-value" id="stat-time">00:00</span><span class="stat-label">Time</span></div>
+          <div class="stat"><span class="stat-value" id="stat-baxs">0.000</span><span class="stat-label">$bAXS</span></div>
+        </header>
+
+        <div class="mode-row">
+          <div class="mode-toggle" role="group" aria-label="Activity mode" id="mode-toggle">
+            <button class="mode-btn" data-mode="walk" data-selected="true">Walk</button>
+            <button class="mode-btn" data-mode="run">Run</button>
+          </div>
+          <div class="gps-tag" id="gps-tag" data-state="idle">
+            <span class="dot"></span><span id="gps-tag-text">GPS ready</span>
+          </div>
+        </div>
+
+        <div class="map-wrap">
+          <div id="map"></div>
+          <div class="axie3d-wrap" id="axie3d-wrap" aria-hidden="true">
+            <div class="axie3d-shadow"></div>
+            <canvas id="axie3d-canvas"></canvas>
+          </div>
+          <canvas id="world-canvas" hidden></canvas>
+
+          <button class="axie-avatar-btn" id="axie-avatar-btn" aria-label="Choose your Axie">
+            <img id="axie-avatar-img" src="/axies/previews/kotaro.png" alt="" />
+          </button>
+          <button class="view-toggle-btn" id="view-toggle-btn" aria-label="Switch between map and 3D world">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 12 2l10 10-10 10z"/><path d="M12 2v20M2 12h20"/></svg>
+            <span id="view-toggle-label">3D World</span>
+          </button>
+          <button class="axie-rotate-btn" id="axie-rotate-btn" aria-label="Rotate Axie 180 degrees">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          </button>
+
+          <div class="map-banner" id="map-banner" hidden></div>
+        </div>
+
+        <footer class="control-bar">
+          <button class="ctrl-btn ctrl-primary" id="go-btn" aria-label="Start">
+            <span id="go-btn-label" class="go-label">GO</span>
+          </button>
+          <button class="ctrl-btn ctrl-primary ctrl-pause" id="pause-btn" aria-label="Pause" hidden>
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          </button>
+          <button class="ctrl-btn ctrl-primary" id="resume-btn" aria-label="Resume" hidden>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>
+          </button>
+          <button class="ctrl-btn ctrl-primary ctrl-stop" id="stop-btn" aria-label="Stop and save" hidden>
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+          </button>
+        </footer>
+      </section>
+
+      <!-- ============ ACTIVITY VIEW ============ -->
+      <section class="view" id="view-activity" hidden>
+        <div class="scroll-view">
+          <div class="section-title">Overall</div>
+          <div class="stats-grid">
+            <div class="stat-tile accent"><span class="val" id="ov-km">0.00</span><span class="lbl">Total KM</span></div>
+            <div class="stat-tile"><span class="val" id="ov-count">0</span><span class="lbl">Activities</span></div>
+            <div class="stat-tile accent"><span class="val" id="ov-baxs">0.000</span><span class="lbl">Total $bAXS</span></div>
+            <div class="stat-tile"><span class="val" id="ov-streak">0</span><span class="lbl">Day streak</span></div>
+          </div>
+
+          <div class="section-title">Background steps</div>
+          <div class="chart-card" id="bg-steps-card">
+            <div class="bg-steps-row">
+              <div class="bg-steps-value-line"><span class="num" id="bg-steps-value">0</span><span class="unit">steps today</span></div>
+              <button class="bg-steps-toggle" id="bg-steps-toggle" data-on="false">Turn on</button>
+            </div>
+            <p class="bg-steps-note">Uses your phone's own step sensor to keep counting all day, even with the app closed &mdash; shown in a permanent notification. This is separate from $bAXS, which you still only earn by pressing GO for a walk or run.</p>
+            <div class="bg-steps-hc" id="bg-steps-hc" hidden>
+              <span id="bg-steps-hc-label">Health Connect</span>
+              <button class="bg-steps-hc-btn" id="bg-steps-hc-btn">Sync</button>
+            </div>
+          </div>
+
+          <div id="activity-charts" hidden>
+            <div class="section-title">This week</div>
+            <div class="chart-card"><h3>Last 7 days &middot; km</h3><canvas id="chart-week" height="120"></canvas></div>
+            <div class="chart-card">
+              <h3>Walk vs run</h3>
+              <canvas id="chart-split" height="140"></canvas>
+              <div class="chart-legend">
+                <span class="item"><span class="swatch" style="background:var(--mint)"></span>Walk</span>
+                <span class="item"><span class="swatch" style="background:var(--amber)"></span>Run</span>
+              </div>
+            </div>
+            <div class="chart-card"><h3>$bAXS earned over time</h3><canvas id="chart-growth" height="120"></canvas></div>
+            <div class="chart-card"><h3>Pace trend &middot; min/km</h3><canvas id="chart-pace" height="120"></canvas></div>
+            <div class="chart-card"><h3>Avg km by weekday</h3><canvas id="chart-weekday" height="120"></canvas></div>
+            <div class="chart-card" id="chart-best-card">
+              <h3>Personal bests</h3>
+              <div class="best-grid">
+                <div class="best-tile"><span class="val" id="best-km">&mdash;</span><span class="lbl">Longest (km)</span></div>
+                <div class="best-tile"><span class="val" id="best-pace">&mdash;</span><span class="lbl">Best pace (min/km)</span></div>
+                <div class="best-tile"><span class="val" id="best-baxs">&mdash;</span><span class="lbl">Best $bAXS session</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">History</div>
+          <div class="pill-row" id="activity-type-row">
+            <button class="pill-btn" data-type="all" data-selected="true">All</button>
+            <button class="pill-btn" data-type="walk">Walk</button>
+            <button class="pill-btn" data-type="run">Run</button>
+          </div>
+          <div id="activity-list"></div>
+          <div class="empty-state" id="activity-empty">
+            <div class="big">No activities yet</div>
+            <div class="small">Head to Track and hit GO to log your first walk or run.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ LEADERBOARD VIEW ============ -->
+      <section class="view" id="view-leaderboard" hidden>
+        <div class="scroll-view">
+          <div class="leaderboard-banner">
+            <img src="/banners/leaderboard-hero.jpg" alt="A flock of Axies soaring over the Axie GO islands" loading="lazy" />
+          </div>
+          <div class="mode-toggle lb-main-tabs" role="group" aria-label="Leaderboard type" id="lb-type-row">
+            <button class="mode-btn" data-lbtype="walk" data-selected="true">Walk</button>
+            <button class="mode-btn" data-lbtype="run">Run</button>
+          </div>
+          <div class="pill-row" id="lb-period-row">
+            <button class="pill-btn" data-period="day" data-selected="true">Daily</button>
+            <button class="pill-btn" data-period="week">Weekly</button>
+            <button class="pill-btn" data-period="month">Monthly</button>
+          </div>
+
+          <div class="lb-note">Ranked by distance for the selected period. This standalone app has no shared server yet, so the 50 other trainers below are seeded example data, not real players — your own logged sessions ("You") rank among them live. A real backend would replace these with everyone's actual scores.</div>
+
+          <div id="leaderboard-list"></div>
+          <div class="empty-state" id="leaderboard-empty" hidden>
+            <div class="big">Nothing logged in this period</div>
+            <div class="small">Save an activity in this window to climb the board.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CHALLENGE VIEW ============ -->
+      <section class="view" id="view-challenge" hidden>
+        <div class="scroll-view">
+          <div class="section-title">Challenge pools</div>
+          <div id="challenge-pools"></div>
+          <div id="challenge-active-section"></div>
+          <div class="lb-note">Each pool runs its own 24-hour window and you can join more than one at once — every walk or run you log counts toward all of them. Like the Leaderboard tab, this app has no shared backend yet, so you're the only real entrant on your board — a live pool with other players needs a server behind this later. Finishing a window with a logged walk or run still pays out the pool's $bAXS reward, simulated the same way the rest of this app's $bAXS is.</div>
+          <div class="section-title">History</div>
+          <div id="challenge-history"></div>
+          <div class="empty-state" id="challenge-history-empty">
+            <div class="big">No challenges finished yet</div>
+            <div class="small">Enter a pool above, then log a walk or run before it ends.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ TAB BAR ============ -->
+      <nav class="tab-bar">
+        <button class="tab-btn" data-tab="track" data-active="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 7v10l8 5 8-5V7z"/><path d="M12 2v20M4 7l8 5 8-5"/></svg>
+          <span>Track</span>
+        </button>
+        <button class="tab-btn" data-tab="challenge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 0 12 0"/><path d="M6 3h12v6a6 6 0 0 1-12 0z"/><path d="M9 21h6M12 17v4M4 4h2v3a3 3 0 0 1-2-3zM20 4h-2v3a3 3 0 0 0 2-3z"/></svg>
+          <span>Challenge</span>
+        </button>
+        <button class="tab-btn" data-tab="leaderboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4a1 1 0 0 0-1 1 4 4 0 0 0 4 4M17 6h3a1 1 0 0 1 1 1 4 4 0 0 1-4 4"/></svg>
+          <span>Leaderboard</span>
+        </button>
+        <button class="tab-btn" data-tab="activity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+          <span>Activity</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="share-overlay" id="share-overlay">
+      <div class="share-card-frame"><canvas id="share-canvas" width="1080" height="1350"></canvas></div>
+      <div class="share-actions">
+        <button class="share-close-btn" id="share-close-btn">Close</button>
+        <button class="share-save-btn" id="share-save-btn">Share</button>
+      </div>
+    </div>
+
+    <div class="picker-overlay" id="picker-overlay">
+      <div class="picker-sheet">
+        <div class="picker-header">
+          <h2>Choose your Axie</h2>
+          <button class="picker-close-btn" id="picker-close-btn" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="picker-preview-frame">
+          <canvas id="picker-preview-canvas"></canvas>
+          <div class="picker-preview-name" id="picker-preview-name">&nbsp;</div>
+        </div>
+        <div class="picker-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="picker-search" id="picker-search" type="search" placeholder="Search Axies…" autocomplete="off" />
+        </div>
+        <div class="picker-grid" id="picker-grid"></div>
+        <button class="picker-confirm-btn" id="picker-confirm-btn">Use this Axie</button>
+      </div>
+    </div>
+
+    <!-- ============ CHALLENGE DETAIL (drill-in from an Active pool card) ============ -->
+    <div class="challenge-detail-overlay" id="challenge-detail-overlay" data-open="false">
+      <div class="challenge-detail-sheet">
+        <div class="challenge-detail-banner" id="challenge-detail-banner">
+          <button class="challenge-detail-back" id="challenge-detail-back" aria-label="Back to Challenge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+          </button>
+          <div class="challenge-detail-title">
+            <span class="tier-badge" id="challenge-detail-tier"></span>
+            <h2 id="challenge-detail-name"></h2>
+          </div>
+        </div>
+        <div class="challenge-detail-body scroll-view">
+          <div class="stats-grid challenge-detail-stats">
+            <div class="stat-tile accent"><span class="val" id="cd-distance">0.00</span><span class="lbl">Your KM logged</span></div>
+            <div class="stat-tile"><span class="val" id="cd-countdown">00:00:00</span><span class="lbl">Time left</span></div>
+            <div class="stat-tile accent"><span class="val" id="cd-reward">0</span><span class="lbl">$bAXS if you finish</span></div>
+            <div class="stat-tile"><span class="val" id="cd-rank">&mdash;</span><span class="lbl">Your rank</span></div>
+          </div>
+          <div class="section-title">Leaderboard</div>
+          <div class="lb-note">Seeded example participants for this pool, not real players — same standalone-app limitation as the main Leaderboard tab. Your live progress ranks among them.</div>
+          <div id="challenge-detail-leaderboard"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
